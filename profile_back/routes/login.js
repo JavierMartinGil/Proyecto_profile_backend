@@ -2,16 +2,20 @@ var express = require('express');
 var router = express.Router();
 const jwt = require('jwt-simple');
 const moment = require('moment');
+const bcrypt = require('bcrypt');
 
 const modelLogin = require('../models/login');
 
 
 router.post('/', (req, res) => {
-    console.log(req.body);
-    modelLogin.login(req.body)
+    modelLogin.login(req.body.email)
         .then((result) => {
-            console.log(result.id)
-            res.json({ token_user: createToken(result) });
+            bcrypt.compare(req.body.password, result.password, (err, same) => {
+                if (err) return res.json({ error: 'Error!!!!' })
+                if (!same) return res.json({ error: 'Usuario y o contraseña erroneos (2)' })
+                res.json({ token_user: createToken(result) });
+            });
+
         })
         .catch((err) => {
             res.json({ error: err.message });

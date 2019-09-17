@@ -6,6 +6,7 @@ const modelRegistro = require('../models/registro');
 
 
 router.post('/nuevo', (req, res) => {
+    req.body.password = bcrypt.hashSync(req.body.password, 10);
     modelRegistro.registro(req.body)
         .then((result) => {
             res.json(result);
